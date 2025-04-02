@@ -1,6 +1,0 @@
-(function() {
-    var style = document.createElement('style');
-    var css = '.dfp__inread.adm-ad-rendered { display: block; }';
-    style.appendChild(document.createTextNode(css));
-    document.head.appendChild(style);
-})();
