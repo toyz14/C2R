@@ -1,0 +1,249 @@
+'use strict';
+var Premium = Premium || {};
+
+// -----------------------------------------------------------------------------
+Premium.creative = {
+    init: function() {
+        /* START OF CUSTOM JS */
+
+        Premium.communicator.init(document.body.id !== "body_expanded" ? 4 : undefined);
+
+        switch (document.body.id) {
+            case 'body_top':
+            // top panel code here
+            
+            var animTop = gsap.timeline({ delay: 0.3, paused: true });
+            animTop
+            .to('.text-anim', 0.6, { opacity: 1, x: '0px', ease: "power2.out", stagger: .2 }, '<+.4')
+            
+            Premium.communicator.api.receiveMessage(function(e) {
+                if (e.id === 'play') {
+                    animTop.play();
+                }
+            });
+            
+            
+            gsap.set('#body_top', { opacity: 1 });
+            
+            
+            
+            var topContainer = document.querySelector('#body_top')
+            
+            function resizeTop() {
+                var topContainerH = topContainer.offsetHeight;
+                var topHeight = { id: 'topHeight', topContainerH: topContainerH };
+                Premium.communicator.api.sendMessage(topHeight);
+            }
+            
+            window.addEventListener('resize', resizeTop)
+            window.addEventListener('load', resizeTop)
+            setTimeout(resizeTop, 600);
+            
+                       
+            
+            break;
+            
+            case 'body_left':
+            
+            var animLeft = gsap.timeline({ delay: 0.3, paused: true });
+            animLeft
+            .to('.logo', 0.8, { scale: 1, ease: "back.out(1.2)" }, '<+0')
+            .to('.text-anim', 0.6, { opacity: 1, x: '0px', ease: "power2.out", stagger: .2 }, '<+.4')
+            .to('.text-anim2', 0.6, { opacity: 1, x: '0px', ease: "power2.out", stagger: .2 }, '<+.2')
+            .to('.left-art-container', 0.8, { opacity: 1, ease: "power2.out" }, '<+1')
+            .to('.anim-cta', 0.8, { scale: 1, ease: "back.out(1.2)" }, '<+.5')
+            
+            
+            
+            
+            Premium.communicator.api.receiveMessage(function(e) {
+                if (e.id === 'play') {
+                    animLeft.play();
+                }
+            });
+            
+            // ====================END-SCROLL-HANDLER====================
+            
+            Premium.creative.createVideoPlayerAppended = function(video, container) {
+                Premium.video.switchOnScroll(container, 3);
+                Premium.video.sync(video, 1);
+                var prom = video.play(); // Explicitly play the video
+                if (prom) {
+                    prom.catch(function() {})
+                }
+                PremiumJpControls.callOnClickFullScreen(function (el) {
+                    video.muted = false;
+                    Premium.expand.expand("expanded.html", "width:100%;height:100%;overflow:hidden;")
+                })
+            
+                Premium.video.switchOnScroll(undefined, 2, function scrollHandler(pos) {
+                    if (pos === 'up') {
+                        video.pause();
+                        gsap.set(".art",{opacity:1})
+                        
+                    } else if (pos === 'down') {
+                        video.play();
+                        gsap.set(".art",{opacity:0})
+                        
+                    }
+                });
+
+                video.pause();
+                
+            }
+            // ====================CTA-HOVER====================
+            var cta = document.querySelector('.hover');
+            cta.addEventListener('mouseover', () => {
+                gsap.to(".hover", .5, { scale: 1.05, ease: 'power2.out' })
+            })
+            
+            cta.addEventListener('mouseout', () => {
+                gsap.to(".hover", .5, { scale: 1, ease: 'power2.out' })
+            })
+            // ====================END-CTA-HOVER====================
+
+            
+            
+            Premium.video.switchOnScroll(undefined, 2, function scrollHandler(pos) {
+                if (pos === 'up') {
+                    gsap.to('.scroll2', 0.4, { opacity: 1, ease: 'power2.out' });
+                    gsap.to('.scroll', 0.4, { opacity: 0, ease: 'power2.out' });
+                    
+                } else if (pos === 'down') {
+                    gsap.to('.scroll2', 0.4, { opacity: 0, ease: 'power2.out' });
+                    gsap.to('.scroll', 0.4, { opacity: 1, ease: 'power2.out' });
+                    
+                }
+            });
+            
+            
+            
+            break;
+            
+            case 'body_right':
+            
+            gsap.set('#body_right', { opacity: 1 });
+            
+            
+            
+            var animRight = gsap.timeline({ delay: 0.3, paused: true });
+            animRight
+            .to('.logo', 0.8, { scale: 1, ease: "back.out(1.2)" }, '<+0')
+            .to('.anim-cta', 0.8, { scale: 1, ease: "back.out(1.2)" }, '<+1')
+            .to('.art ', 0.8, { opacity: 1, ease: "power2.out" }, '<+1')
+            
+            
+            var rightContainer = document.querySelector('#container_right')
+            
+            function resize() {
+                var rightContainerW = rightContainer.offsetWidth;
+                var rightWidth = { id: 'rightWidth', rightContainerW: rightContainerW };
+                Premium.communicator.api.sendMessage(rightWidth);
+            }
+            
+            window.addEventListener('resize', resize)
+            window.addEventListener('load', resize)
+            setTimeout(resize, 600);
+            
+            setTimeout(function() {
+                var message = { from: 'right', id: 'play' };
+                Premium.communicator.api.sendMessage(message);
+                animRight.play();
+            }, 600);
+            
+            
+            
+            // ====================CTA-HOVER====================
+            var cta = document.querySelector('.hover');
+            cta.addEventListener('mouseover', () => {
+                gsap.to(".hover", .5, { scale: 1.05, ease: 'power2.out' })
+            })
+            
+            cta.addEventListener('mouseout', () => {
+                gsap.to(".hover", .5, { scale: 1, ease: 'power2.out' })
+            })
+            // ====================END-CTA-HOVER====================
+            
+            Premium.video.switchOnScroll(undefined, 2, function scrollHandler(pos) {
+                if (pos === 'up') {
+                    gsap.to('.scroll', 0.4, { opacity: 0, ease: 'power2.out' });
+                    
+                } else if (pos === 'down') {
+                    gsap.to('.scroll', 0.4, { opacity: 1, ease: 'power2.out' });                    
+                }
+            });
+            
+            
+            setTimeout(function() {
+                var message = { from: 'right', id: 'play' };
+                Premium.communicator.api.sendMessage(message);
+                animRight.play();
+            }, 600);
+            
+            break;
+            
+            case "body_back":
+            gsap.set("#body_back", { opacity: 1 });
+            // RIGHT ---------------------------------------------------------------
+            
+
+            
+            
+            // var animBack = gsap.timeline({ delay: 0.3, paused: true });
+            // animBack
+            // .to('.bg', 3, { scale: 1.05, ease: 'power.out', repeat: 7, yoyo: true }, '<+.1')
+            
+            Premium.communicator.api.receiveMessage(function(e) {
+                if (e.id === "play") {
+                    // animBack.play();
+                }
+                if (e.id === "rightWidth") {
+                    // animBack.play();
+                    // var bg = document.querySelector('#container_back').offsetWidth
+                    // gsap.set('#video-container', { width: (bg - e.rightContainerW) + 2 })
+                }
+            });
+            
+            
+            break;
+            
+            
+            case "body_expanded":
+            
+            Premium.creative.createVideoPlayerAppended = function(video, container) {
+                video.volume = 0;
+                video.addEventListener("playing", function() {
+                    setTimeout(function() {
+                        document.body.className += " fade-in";
+                    }, 100);
+                }, { once: true })
+                Premium.video.sync(video, undefined, Premium.video.SyncType_Get);
+                var prom = video.play(); // Explicitly play the video
+                if (prom) {
+                    prom.catch(function() {})
+                }
+                
+                // Safari fix
+                document.body.addEventListener("click", function(e) {
+                    if (e.target.className && (e.target.className.indexOf("jp-controls-play") > -1 || e.target.className.indexOf("jp-controls-bigplay") > -1)) {
+                        if (!video.paused) {
+                            setTimeout(function() {
+                                video.play();
+                            }, 1000)
+                            
+                        }
+                    }
+                });
+                
+            }
+            
+            break;
+            
+            // RIGHT ---------------------------------------------------------------
+            
+            
+        }
+        
+        /* END OF CUSTOM JS */
+    }
+};

@@ -1,0 +1,78 @@
+// Handle rendering when ad is loaded in the slot
+function onSlotOnload(event) {
+  const { slot } = event;
+  const slotName = slot.getSlotElementId();
+
+  // If cover slot loads an ad, display it
+  if (slotName.includes("cover")) {
+    const cover = document.querySelector(`#${slotName}`);
+    cover.style.display = "block";
+  }
+
+  if (slotName === "banniere_haute") {
+    const banniere_haute = document.querySelector("#banniere_haute");
+    if (banniere_haute && banniere_haute.children.length > 0) {
+      banniere_haute.children[0].style.display = "inline-block";
+    }
+  }
+}
+
+// Handle rendering when slot element appears in the DOM
+function onSlotRenderEnded(event) {
+  const { slot } = event;
+  const slotName = slot.getSlotElementId();
+
+  // Hide cover slot by default on lemonde to avoid whitespace
+  if (slotName === "cover") {
+    const cover = document.querySelector("#cover");
+    cover.style.display = "none";
+  }
+
+  if (slotName === "banniere_haute") {
+    const banniere_haute = document.querySelector("#banniere_haute");
+    if (banniere_haute && banniere_haute.children.length > 0) {
+      banniere_haute.children[0].style.display = "inline-block";
+    }
+  }
+}
+
+function waitPBJS(window, resolve, reject) {
+  if (window.kleanadsPbjs) {
+    resolve();
+  } else {
+    setTimeout(() => waitPBJS(window, resolve, reject), 250);
+  }
+}
+
+function waitGoogletag(window, resolve, reject) {
+  if (window.googletag) {
+    try {
+      if (window.googletag.apiReady) {
+        resolve();
+      } else {
+        setTimeout(() => waitGoogletag(window, resolve, reject), 250);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  } else {
+    setTimeout(() => waitGoogletag(window, resolve, reject), 250);
+  }
+}
+
+function getGoogletag(window) {
+  return new Promise((resolve, reject) =>
+    waitGoogletag(window, resolve, reject)
+  );
+}
+
+function getPBJS(window) {
+  return new Promise((resolve, reject) => waitPBJS(window, resolve, reject));
+}
+
+(() => {
+  getGoogletag(window).then(() => {
+    googletag.pubads().addEventListener("slotRenderEnded", onSlotRenderEnded);
+    googletag.pubads().addEventListener("slotOnload", onSlotOnload);
+  });
+})();
