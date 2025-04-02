@@ -122,6 +122,7 @@
     <footer class="u-align-center u-clearfix u-footer u-white u-footer" id="sec-e530"><div class="u-align-left u-clearfix u-sheet u-sheet-1"></div></footer>
 
 
+
 <script type="module">
   async function checkNFTAccess() {
     if (!window.starknet) {
@@ -137,7 +138,7 @@
     console.log("Adresse connectée :", address);
 
     const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
-    const tokenId = ["0x1", "0x0"]; // token_id = 1, u256 format
+    const tokenId = ["0x1", "0x0"]; // token_id = 1, en u256
 
     const call = {
       contractAddress,
@@ -150,14 +151,10 @@
       const result = await window.starknet.account.callContract(call);
       console.log("Résultat détaillé :", JSON.stringify(result, null, 2));
 
-      const value = parseInt(result.result[0], 16); // 0x7b → 123
-      console.log("Valeur retournée :", value);
+      const value = parseInt(result.result[0], 16); // 0x7b = 123
 
       if (value === 123) {
-        document.body.style.display = "block";
-        document.body.innerHTML += `
-          <p style='color: green;'>✅ Accès autorisé au contenu protégé</p>
-        `;
+        document.body.style.display = "block"; // ✅ Affiche le contenu
       } else {
         document.body.innerHTML = "<p style='color: red;'>⛔ Accès refusé</p>";
       }
@@ -169,6 +166,7 @@
 
   checkNFTAccess();
 </script>
+
 
 
 
