@@ -125,16 +125,19 @@
 <script type="module">
   async function checkNFTAccess() {
     if (!window.starknet) {
+      console.log("Argent X non détecté");
       alert("Veuillez installer Argent X.");
       return;
     }
+
+    console.log("Argent X détecté");
 
     await window.starknet.enable();
     const address = window.starknet.selectedAddress;
     console.log("Adresse connectée :", address);
 
     const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
-    const tokenId = "0x1"; // identifiant du NFT à vérifier
+    const tokenId = "0x1";
 
     const call = {
       contractAddress,
@@ -143,6 +146,7 @@
     };
 
     try {
+      console.log("Envoi de l’appel au contrat...");
       const result = await window.starknet.account.callContract(call);
       console.log("Résultat du contrat :", result);
 
@@ -153,13 +157,14 @@
         document.body.innerHTML = "<p style='color: red;'>⛔ Accès refusé</p>";
       }
     } catch (error) {
-      console.error("Erreur d'accès au contrat :", error);
+      console.error("Erreur lors de l’appel au contrat :", error);
       document.body.innerHTML = "<p style='color: red;'>⛔ Erreur de vérification</p>";
     }
   }
 
   checkNFTAccess();
 </script>
+
 
 
 
