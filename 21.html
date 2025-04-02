@@ -149,9 +149,12 @@
       const result = await window.starknet.account.callContract(call);
       console.log("Résultat du contrat :", result);
 
-      if (result && result.length > 0 && result[0] !== "0x0") {
-        document.body.style.display = "block";
-        document.body.innerHTML += "<p style='color: green;'>✅ Accès autorisé</p>";
+      if (result && result.length > 0) {
+  document.body.style.display = "block";
+  document.body.innerHTML += `
+    <p style='color: green;'>✅ Accès autorisé</p>
+    <pre>${JSON.stringify(result, null, 2)}</pre>
+  `;
       } else {
         document.body.innerHTML = "<p style='color: red;'>⛔ Accès refusé</p>";
       }
