@@ -142,7 +142,8 @@
     const call = {
       contractAddress,
       entrypoint: "token_uri",
-      calldata: [tokenId],
+      calldata: ["0x1", "0x0"], // u256: low = 1, high = 0
+
     };
 
     try {
