@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html style="font-size: 16px;">
   <head>
+
+
+
+	  <style>
+  body {
+    display: none;
+  }
+</style>
+
+
+
+	  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <meta name="keywords" content="">
@@ -121,13 +133,13 @@
     const address = window.starknet.selectedAddress;
     console.log("Adresse connectée :", address);
 
-    // Appel à ton contrat
+    // Contrat à interroger
     const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
-    const tokenId = "0x1"; // Par exemple, vérifier le token_id 1
+    const tokenId = "0x1"; // identifiant du NFT à vérifier
 
     const call = {
       contractAddress,
-      entrypoint: "token_uri", // ou une fonction comme owner_of si elle existe
+      entrypoint: "token_uri",
       calldata: [tokenId],
     };
 
@@ -135,15 +147,15 @@
       const result = await window.starknet.account.callContract(call);
       console.log("Résultat du contrat :", result);
 
-      // Si la fonction retourne une URI valide ou une valeur non vide → accès OK
       if (result && result.length > 0 && result[0] !== "0x0") {
-        document.body.innerHTML += "<p>✅ Accès autorisé</p>";
+        document.body.style.display = "block";
+        document.body.innerHTML += "<p style='color: green;'>✅ Accès autorisé</p>";
       } else {
-        document.body.innerHTML = "<p>⛔ Accès refusé</p>";
+        document.body.innerHTML = "<p style='color: red;'>⛔ Accès refusé</p>";
       }
     } catch (error) {
       console.error("Erreur d'accès au contrat :", error);
-      document.body.innerHTML = "<p>⛔ Accès refusé (contrat inaccessible)</p>";
+      document.body.innerHTML = "<p style='color: red;'>⛔ Erreur de vérification</p>";
     }
   }
 
