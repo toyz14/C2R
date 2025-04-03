@@ -126,7 +126,6 @@
     const interval = 200;
     const maxTries = timeout / interval;
     let tries = 0;
-
     return new Promise((resolve, reject) => {
       const check = () => {
         if (window.starknet) {
@@ -145,7 +144,6 @@
     const interval = 2000;
     const maxTries = timeout / interval;
     let tries = 0;
-
     return new Promise((resolve, reject) => {
       const loop = async () => {
         try {
@@ -169,13 +167,12 @@
       console.log("✅ Argent X détecté");
 
       await getConnectedAccount(starknet);
-      const userAddress = starknet.selectedAddress;
+      const userAddress = starknet.selectedAddress.toLowerCase();
       console.log("✅ Compte connecté :", userAddress);
 
-      const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
+      const contractAddress = "0x039ad654c7796b9ad8370f252342abb75a40b387ac08ef5a7bf1684eba4faaff";
       const tokenId = ["0x1", "0x0"]; // token_id = 1
 
-      // Appel de ownerOf pour vérifier la propriété du token
       const result = await starknet.account.callContract({
         contractAddress,
         entrypoint: "ownerOf",
@@ -183,11 +180,9 @@
       });
 
       const owner = result.result[0].toLowerCase();
-      const current = userAddress.toLowerCase();
+      console.log("👤 Propriétaire du token 1 :", owner);
 
-      console.log("Propriétaire du token :", owner);
-
-      if (owner === current) {
+      if (owner === userAddress) {
         document.body.style.display = "block";
         document.body.innerHTML += `<p style="color:green;">✅ Accès autorisé</p>`;
       } else {
@@ -202,6 +197,7 @@
 
   window.addEventListener("load", checkNFTAccess);
 </script>
+
 
 
 
