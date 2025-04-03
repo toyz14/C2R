@@ -121,39 +121,43 @@
     <footer class="u-align-center u-clearfix u-footer u-white u-footer" id="sec-e530"><div class="u-align-left u-clearfix u-sheet u-sheet-1"></div></footer>
 
   
- <!-- À placer juste avant </body> -->
 <script type="module">
   async function checkNFTAccess() {
-    if (!window.starknet) {
-      console.log("Argent X non détecté");
-      alert("Veuillez installer l’extension Argent X pour accéder à cette page.");
-      return;
-    }
-
-    console.log("Argent X détecté");
-
-    await window.starknet.enable();
-    const address = window.starknet.selectedAddress;
-    console.log("Adresse connectée :", address);
-
-    // Adresse de ton contrat déployé sur StarkNet mainnet
-    const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
-
-    // ID du token (1), format u256 = [low, high]
-    const tokenId = ["0x1", "0x0"];
-
-    const call = {
-      contractAddress,
-      entrypoint: "token_uri",
-      calldata: tokenId,
-    };
-
     try {
+      // Re-détection explicite d’Argent X
+      if (typeof window.starknet === "undefined") {
+        alert("Veuillez installer Argent X.");
+        return;
+      }
+
+      const connected = await window.starknet.isConnected?.();
+      if (!connected) {
+        console.log("Connexion à Argent X en cours...");
+        await window.starknet.enable();
+      }
+
+      const address = window.starknet.selectedAddress;
+      if (!address) {
+        alert("Impossible de récupérer l'adresse du wallet.");
+        return;
+      }
+
+      console.log("Adresse connectée :", address);
+
+      const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
+      const tokenId = ["0x1", "0x0"];
+
+      const call = {
+        contractAddress,
+        entrypoint: "token_uri",
+        calldata: tokenId,
+      };
+
       console.log("Envoi de l’appel au contrat...");
       const result = await window.starknet.account.callContract(call);
       console.log("Résultat détaillé :", JSON.stringify(result, null, 2));
 
-      const value = parseInt(result.result[0], 16); // converti 0x7b → 123
+      const value = parseInt(result.result[0], 16);
       console.log("Valeur retournée :", value);
 
       if (value === 123) {
@@ -164,14 +168,17 @@
       } else {
         document.body.innerHTML = "<p style='color: red;'>⛔ Accès refusé</p>";
       }
+
     } catch (error) {
-      console.error("Erreur lors de l’appel au contrat :", error);
+      console.error("Erreur lors de l’appel ou connexion Argent X :", error);
       document.body.innerHTML = "<p style='color: red;'>⛔ Erreur de vérification</p>";
     }
   }
 
-  checkNFTAccess();
+  // Lancement du script une fois que DOM est prêt
+  window.addEventListener("DOMContentLoaded", checkNFTAccess);
 </script>
+
 
 
 
