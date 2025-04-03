@@ -142,7 +142,7 @@
   }
 
   async function getConnectedAccount(starknet, timeout = 15000) {
-    const interval = 2000; // essaie toutes les 2 secondes
+    const interval = 2000;
     const maxTries = timeout / interval;
     let tries = 0;
 
@@ -153,14 +153,10 @@
           if (starknet.account && starknet.selectedAddress) {
             return resolve(starknet);
           }
-        } catch (e) {
-          console.warn("Tentative de connexion échouée :", e);
-        }
-
+        } catch (_) {}
         if (++tries >= maxTries) {
-          return reject(new Error("Impossible de récupérer le compte connecté après plusieurs essais."));
+          return reject(new Error("Impossible de récupérer le compte connecté."));
         }
-
         setTimeout(loop, interval);
       };
       loop();
@@ -172,30 +168,30 @@
       const starknet = await waitForStarknet();
       console.log("✅ Argent X détecté");
 
-      const connected = await getConnectedAccount(starknet);
-      console.log("✅ Compte connecté :", connected.selectedAddress);
+      await getConnectedAccount(starknet);
+      const userAddress = starknet.selectedAddress;
+      console.log("✅ Compte connecté :", userAddress);
 
       const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
-      const tokenId = ["0x1", "0x0"];
+      const tokenId = ["0x1", "0x0"]; // token_id = 1
 
-      const call = {
+      // Appel de ownerOf pour vérifier la propriété du token
+      const result = await starknet.account.callContract({
         contractAddress,
-        entrypoint: "token_uri",
+        entrypoint: "ownerOf",
         calldata: tokenId,
-      };
+      });
 
-      console.log("Appel du contrat...");
-      const result = await connected.account.callContract(call);
-      console.log("Résultat :", result);
+      const owner = result.result[0].toLowerCase();
+      const current = userAddress.toLowerCase();
 
-      const value = parseInt(result.result[0], 16);
-      console.log("Valeur retournée :", value);
+      console.log("Propriétaire du token :", owner);
 
-      if (value === 123) {
+      if (owner === current) {
         document.body.style.display = "block";
         document.body.innerHTML += `<p style="color:green;">✅ Accès autorisé</p>`;
       } else {
-        document.body.innerHTML = `<p style="color:red;">⛔ Accès refusé</p>`;
+        document.body.innerHTML = `<p style="color:red;">⛔ Ce wallet ne possède pas le NFT requis</p>`;
       }
 
     } catch (err) {
@@ -206,6 +202,7 @@
 
   window.addEventListener("load", checkNFTAccess);
 </script>
+
 
 
 
