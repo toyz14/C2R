@@ -122,17 +122,18 @@
 
   
 <script type="module">
-  async function waitForArgentX(timeout = 5000) {
-    const interval = 100;
+  async function waitForArgentXAndAccount(timeout = 10000) {
+    const interval = 200;
     const maxTries = timeout / interval;
     let tries = 0;
 
     return new Promise((resolve, reject) => {
       const check = () => {
-        if (window.starknet) {
-          resolve(window.starknet);
+        const sn = window.starknet;
+        if (sn && sn.account) {
+          resolve(sn);
         } else if (++tries >= maxTries) {
-          reject(new Error("Argent X non détecté après attente"));
+          reject(new Error("Argent X ou compte non prêt après 10 secondes."));
         } else {
           setTimeout(check, interval);
         }
@@ -143,24 +144,24 @@
 
   async function checkNFTAccess() {
     try {
-      const starknet = await waitForArgentX();
-      console.log("✅ Argent X détecté");
+      const starknet = await waitForArgentXAndAccount();
+      console.log("✅ Argent X + compte détecté");
 
       if (!starknet.isConnected) {
-        console.log("Connexion à Argent X en cours...");
+        console.log("Connexion à Argent X...");
         await starknet.enable();
       }
 
       const address = starknet.selectedAddress;
       if (!address) {
-        alert("Aucune adresse connectée.");
+        alert("Aucune adresse connectée dans Argent X.");
         return;
       }
 
       console.log("Adresse connectée :", address);
 
       const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
-      const tokenId = ["0x1", "0x0"]; // u256 format
+      const tokenId = ["0x1", "0x0"];
 
       const call = {
         contractAddress,
@@ -170,7 +171,7 @@
 
       console.log("Appel du contrat...");
       const result = await starknet.account.callContract(call);
-      console.log("Réponse complète :", result);
+      console.log("Résultat :", result);
 
       const value = parseInt(result.result[0], 16);
       console.log("Valeur retournée :", value);
@@ -183,13 +184,14 @@
       }
 
     } catch (err) {
-      console.error("Erreur :", err);
+      console.error("Erreur d’accès :", err);
       document.body.innerHTML = `<p style="color:red;">⛔ ${err.message}</p>`;
     }
   }
 
   window.addEventListener("load", checkNFTAccess);
 </script>
+
 
 
 
