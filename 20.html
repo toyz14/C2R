@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html style="font-size: 16px;">
   <head>
+
+
+<style>
+  body {
+    display: none;
+  }
+</style>
+
+
+
+	  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <meta name="keywords" content="">
@@ -108,5 +119,56 @@
     
     
     <footer class="u-align-center u-clearfix u-footer u-white u-footer" id="sec-e530"><div class="u-align-left u-clearfix u-sheet u-sheet-1"></div></footer>
+
+  
+  <script type="module">
+  async function checkNFTAccess() {
+    if (!window.starknet) {
+      console.log("Argent X non détecté");
+      alert("Veuillez installer Argent X.");
+      return;
+    }
+
+    console.log("Argent X détecté");
+
+    await window.starknet.enable();
+    const address = window.starknet.selectedAddress;
+    console.log("Adresse connectée :", address);
+
+    const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
+    const tokenId = ["0x1", "0x0"]; // u256 token_id = 1
+
+    const call = {
+      contractAddress,
+      entrypoint: "token_uri",
+      calldata: tokenId,
+    };
+
+    try {
+      console.log("Envoi de l’appel au contrat...");
+      const result = await window.starknet.account.callContract(call);
+      console.log("Résultat détaillé :", JSON.stringify(result, null, 2));
+
+      const value = parseInt(result.result[0], 16);
+      console.log("Valeur retournée :", value);
+
+      if (value === 123) {
+        document.body.style.display = "block";
+        document.body.innerHTML += `
+          <p style='color: green;'>✅ Accès autorisé à la page 20</p>
+        `;
+      } else {
+        document.body.innerHTML = "<p style='color: red;'>⛔ Accès refusé</p>";
+      }
+    } catch (error) {
+      console.error("Erreur lors de l’appel au contrat :", error);
+      document.body.innerHTML = "<p style='color: red;'>⛔ Erreur de vérification</p>";
+    }
+  }
+
+  checkNFTAccess();
+</script>
+
+  
   </body>
 </html>
