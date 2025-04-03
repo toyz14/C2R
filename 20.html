@@ -124,28 +124,29 @@
 <script type="module">
   async function checkNFTAccess() {
     try {
-      // Re-détection explicite d’Argent X
+      // Étape 1 : présence d'Argent X
       if (typeof window.starknet === "undefined") {
-        alert("Veuillez installer Argent X.");
+        alert("Veuillez installer l’extension Argent X : https://www.argent.xyz/argent-x/");
         return;
       }
 
-      const connected = await window.starknet.isConnected?.();
-      if (!connected) {
-        console.log("Connexion à Argent X en cours...");
-        await window.starknet.enable();
-      }
+      console.log("Argent X détecté ✅");
 
+      // Étape 2 : tenter de se connecter (si pas déjà fait)
+      await window.starknet.enable();
+
+      // Étape 3 : récupérer l’adresse connectée
       const address = window.starknet.selectedAddress;
       if (!address) {
-        alert("Impossible de récupérer l'adresse du wallet.");
+        alert("Aucune adresse détectée dans Argent X.");
         return;
       }
 
       console.log("Adresse connectée :", address);
 
+      // Étape 4 : appeler ton contrat StarkNet
       const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
-      const tokenId = ["0x1", "0x0"];
+      const tokenId = ["0x1", "0x0"]; // u256 format
 
       const call = {
         contractAddress,
@@ -153,31 +154,29 @@
         calldata: tokenId,
       };
 
-      console.log("Envoi de l’appel au contrat...");
+      console.log("Appel du contrat...");
       const result = await window.starknet.account.callContract(call);
-      console.log("Résultat détaillé :", JSON.stringify(result, null, 2));
+      console.log("Réponse complète :", result);
 
       const value = parseInt(result.result[0], 16);
       console.log("Valeur retournée :", value);
 
       if (value === 123) {
         document.body.style.display = "block";
-        document.body.innerHTML += `
-          <p style='color: green;'>✅ Accès autorisé</p>
-        `;
+        document.body.innerHTML += `<p style="color:green;">✅ Accès autorisé</p>`;
       } else {
-        document.body.innerHTML = "<p style='color: red;'>⛔ Accès refusé</p>";
+        document.body.innerHTML = `<p style="color:red;">⛔ Accès refusé</p>`;
       }
-
-    } catch (error) {
-      console.error("Erreur lors de l’appel ou connexion Argent X :", error);
-      document.body.innerHTML = "<p style='color: red;'>⛔ Erreur de vérification</p>";
+    } catch (err) {
+      console.error("Erreur : ", err);
+      document.body.innerHTML = `<p style="color:red;">⛔ Erreur : ${err.message || err}</p>`;
     }
   }
 
-  // Lancement du script une fois que DOM est prêt
+  // Lancer seulement après chargement DOM
   window.addEventListener("DOMContentLoaded", checkNFTAccess);
 </script>
+
 
 
 
