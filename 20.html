@@ -121,11 +121,12 @@
     <footer class="u-align-center u-clearfix u-footer u-white u-footer" id="sec-e530"><div class="u-align-left u-clearfix u-sheet u-sheet-1"></div></footer>
 
   
-  <script type="module">
+ <!-- À placer juste avant </body> -->
+<script type="module">
   async function checkNFTAccess() {
     if (!window.starknet) {
       console.log("Argent X non détecté");
-      alert("Veuillez installer Argent X.");
+      alert("Veuillez installer l’extension Argent X pour accéder à cette page.");
       return;
     }
 
@@ -135,8 +136,11 @@
     const address = window.starknet.selectedAddress;
     console.log("Adresse connectée :", address);
 
+    // Adresse de ton contrat déployé sur StarkNet mainnet
     const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
-    const tokenId = ["0x1", "0x0"]; // token_id = 1, au format u256 [low, high]
+
+    // ID du token (1), format u256 = [low, high]
+    const tokenId = ["0x1", "0x0"];
 
     const call = {
       contractAddress,
@@ -149,13 +153,13 @@
       const result = await window.starknet.account.callContract(call);
       console.log("Résultat détaillé :", JSON.stringify(result, null, 2));
 
-      const value = parseInt(result.result[0], 16); // lecture du résultat en hex
+      const value = parseInt(result.result[0], 16); // converti 0x7b → 123
       console.log("Valeur retournée :", value);
 
       if (value === 123) {
         document.body.style.display = "block";
         document.body.innerHTML += `
-          <p style='color: green;'>✅ Accès autorisé à la page 20</p>
+          <p style='color: green;'>✅ Accès autorisé</p>
         `;
       } else {
         document.body.innerHTML = "<p style='color: red;'>⛔ Accès refusé</p>";
@@ -168,6 +172,7 @@
 
   checkNFTAccess();
 </script>
+
 
 
   
