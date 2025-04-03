@@ -144,15 +144,23 @@
   async function checkNFTAccess() {
     try {
       const starknet = await waitForArgentX();
+      console.log("✅ Argent X détecté");
 
-      console.log("Argent X détecté ✅");
+      if (!starknet.isConnected) {
+        console.log("Connexion à Argent X en cours...");
+        await starknet.enable();
+      }
 
-      await starknet.enable();
       const address = starknet.selectedAddress;
+      if (!address) {
+        alert("Aucune adresse connectée.");
+        return;
+      }
+
       console.log("Adresse connectée :", address);
 
       const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
-      const tokenId = ["0x1", "0x0"]; // u256
+      const tokenId = ["0x1", "0x0"]; // u256 format
 
       const call = {
         contractAddress,
@@ -173,15 +181,16 @@
       } else {
         document.body.innerHTML = `<p style="color:red;">⛔ Accès refusé</p>`;
       }
+
     } catch (err) {
       console.error("Erreur :", err);
-      alert("Veuillez installer l’extension Argent X : https://www.argent.xyz/argent-x/");
+      document.body.innerHTML = `<p style="color:red;">⛔ ${err.message}</p>`;
     }
   }
 
-  // Lancer après le chargement complet
   window.addEventListener("load", checkNFTAccess);
 </script>
+
 
 
 
