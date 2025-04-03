@@ -141,26 +141,29 @@
     });
   }
 
-  async function connectArgentXUntilReady(starknet, timeout = 10000) {
-    const interval = 300;
+  async function getConnectedAccount(starknet, timeout = 15000) {
+    const interval = 2000; // essaie toutes les 2 secondes
     const maxTries = timeout / interval;
     let tries = 0;
 
     return new Promise((resolve, reject) => {
-      const tryConnect = async () => {
+      const loop = async () => {
         try {
           await starknet.enable();
-        } catch (_) {}
-
-        if (starknet.account && starknet.selectedAddress) {
-          resolve();
-        } else if (++tries >= maxTries) {
-          reject(new Error("Impossible d'obtenir une adresse depuis Argent X."));
-        } else {
-          setTimeout(tryConnect, interval);
+          if (starknet.account && starknet.selectedAddress) {
+            return resolve(starknet);
+          }
+        } catch (e) {
+          console.warn("Tentative de connexion échouée :", e);
         }
+
+        if (++tries >= maxTries) {
+          return reject(new Error("Impossible de récupérer le compte connecté après plusieurs essais."));
+        }
+
+        setTimeout(loop, interval);
       };
-      tryConnect();
+      loop();
     });
   }
 
@@ -169,10 +172,8 @@
       const starknet = await waitForStarknet();
       console.log("✅ Argent X détecté");
 
-      await connectArgentXUntilReady(starknet);
-      const address = starknet.selectedAddress;
-
-      console.log("Adresse connectée :", address);
+      const connected = await getConnectedAccount(starknet);
+      console.log("✅ Compte connecté :", connected.selectedAddress);
 
       const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
       const tokenId = ["0x1", "0x0"];
@@ -184,7 +185,7 @@
       };
 
       console.log("Appel du contrat...");
-      const result = await starknet.account.callContract(call);
+      const result = await connected.account.callContract(call);
       console.log("Résultat :", result);
 
       const value = parseInt(result.result[0], 16);
@@ -205,6 +206,7 @@
 
   window.addEventListener("load", checkNFTAccess);
 </script>
+
 
 
 
