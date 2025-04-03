@@ -122,31 +122,37 @@
 
   
 <script type="module">
+  async function waitForArgentX(timeout = 5000) {
+    const interval = 100;
+    const maxTries = timeout / interval;
+    let tries = 0;
+
+    return new Promise((resolve, reject) => {
+      const check = () => {
+        if (window.starknet) {
+          resolve(window.starknet);
+        } else if (++tries >= maxTries) {
+          reject(new Error("Argent X non détecté après attente"));
+        } else {
+          setTimeout(check, interval);
+        }
+      };
+      check();
+    });
+  }
+
   async function checkNFTAccess() {
     try {
-      // Étape 1 : présence d'Argent X
-      if (typeof window.starknet === "undefined") {
-        alert("Veuillez installer l’extension Argent X : https://www.argent.xyz/argent-x/");
-        return;
-      }
+      const starknet = await waitForArgentX();
 
       console.log("Argent X détecté ✅");
 
-      // Étape 2 : tenter de se connecter (si pas déjà fait)
-      await window.starknet.enable();
-
-      // Étape 3 : récupérer l’adresse connectée
-      const address = window.starknet.selectedAddress;
-      if (!address) {
-        alert("Aucune adresse détectée dans Argent X.");
-        return;
-      }
-
+      await starknet.enable();
+      const address = starknet.selectedAddress;
       console.log("Adresse connectée :", address);
 
-      // Étape 4 : appeler ton contrat StarkNet
       const contractAddress = "0x0724448d73c98daed6c7e5c09ec5ece97b02542e4221fe1f80ffc08f8c85efe3";
-      const tokenId = ["0x1", "0x0"]; // u256 format
+      const tokenId = ["0x1", "0x0"]; // u256
 
       const call = {
         contractAddress,
@@ -155,7 +161,7 @@
       };
 
       console.log("Appel du contrat...");
-      const result = await window.starknet.account.callContract(call);
+      const result = await starknet.account.callContract(call);
       console.log("Réponse complète :", result);
 
       const value = parseInt(result.result[0], 16);
@@ -168,14 +174,15 @@
         document.body.innerHTML = `<p style="color:red;">⛔ Accès refusé</p>`;
       }
     } catch (err) {
-      console.error("Erreur : ", err);
-      document.body.innerHTML = `<p style="color:red;">⛔ Erreur : ${err.message || err}</p>`;
+      console.error("Erreur :", err);
+      alert("Veuillez installer l’extension Argent X : https://www.argent.xyz/argent-x/");
     }
   }
 
-window.addEventListener("load", checkNFTAccess);
-
+  // Lancer après le chargement complet
+  window.addEventListener("load", checkNFTAccess);
 </script>
+
 
 
 
