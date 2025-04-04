@@ -124,7 +124,7 @@
 
 
 
-	  <script type="module">
+	<script type="module">
   async function waitForStarknet(timeout = 10000) {
     const interval = 200;
     const maxTries = timeout / interval;
@@ -187,14 +187,14 @@
 
       if (owner === userAddress) {
         document.body.style.display = "block";
-        document.body.innerHTML += <p style="color:green;">✅ Accès autorisé</p>;
+        document.body.innerHTML += `<p style="color:green;">✅ Accès autorisé</p>`;
       } else {
-        document.body.innerHTML = <p style="color:red;">⛔ Ce wallet ne possède pas le NFT requis</p>;
+        document.body.innerHTML = `<p style="color:red;">⛔ Ce wallet ne possède pas le NFT requis</p>`;
       }
 
     } catch (err) {
       console.error("Erreur d’accès :", err);
-      document.body.innerHTML = <p style="color:red;">⛔ ${err.message}</p>;
+      document.body.innerHTML = `<p style="color:red;">⛔ ${err.message}</p>`;
     }
   }
 
