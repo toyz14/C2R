@@ -120,5 +120,87 @@
     
     
     <footer class="u-align-center u-clearfix u-footer u-white u-footer" id="sec-e530"><div class="u-align-left u-clearfix u-sheet u-sheet-1"></div></footer>
+
+
+
+	  <script type="module">
+  async function waitForStarknet(timeout = 10000) {
+    const interval = 200;
+    const maxTries = timeout / interval;
+    let tries = 0;
+    return new Promise((resolve, reject) => {
+      const check = () => {
+        if (window.starknet) {
+          resolve(window.starknet);
+        } else if (++tries >= maxTries) {
+          reject(new Error("Argent X non détecté après 10 secondes."));
+        } else {
+          setTimeout(check, interval);
+        }
+      };
+      check();
+    });
+  }
+
+  async function getConnectedAccount(starknet, timeout = 15000) {
+    const interval = 2000;
+    const maxTries = timeout / interval;
+    let tries = 0;
+    return new Promise((resolve, reject) => {
+      const loop = async () => {
+        try {
+          await starknet.enable();
+          if (starknet.account && starknet.selectedAddress) {
+            return resolve(starknet);
+          }
+        } catch (_) {}
+        if (++tries >= maxTries) {
+          return reject(new Error("Impossible de récupérer le compte connecté."));
+        }
+        setTimeout(loop, interval);
+      };
+      loop();
+    });
+  }
+
+  async function checkNFTAccess() {
+    try {
+      const starknet = await waitForStarknet();
+      console.log("✅ Argent X détecté");
+
+      await getConnectedAccount(starknet);
+      const userAddress = starknet.selectedAddress.toLowerCase();
+      console.log("✅ Compte connecté :", userAddress);
+
+      const contractAddress = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635";
+      const tokenId = ["0x1", "0x0"]; // token_id = 1
+
+      const result = await starknet.account.callContract({
+        contractAddress,
+        entrypoint: "ownerOf",
+        calldata: tokenId,
+      });
+
+      const owner = result.result[0].toLowerCase();
+      console.log("👤 Propriétaire du token 1 :", owner);
+
+      if (owner === userAddress) {
+        document.body.style.display = "block";
+        document.body.innerHTML += `<p style="color:green;">✅ Accès autorisé</p>`;
+      } else {
+        document.body.innerHTML = `<p style="color:red;">⛔ Ce wallet ne possède pas le NFT requis</p>`;
+      }
+
+    } catch (err) {
+      console.error("Erreur d’accès :", err);
+      document.body.innerHTML = `<p style="color:red;">⛔ ${err.message}</p>`;
+    }
+  }
+
+  window.addEventListener("load", checkNFTAccess);
+</script>
+
+
+	  
   </body>
 </html>
