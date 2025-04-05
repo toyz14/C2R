@@ -124,48 +124,6 @@
 
 
 
-<!-- ✅ MINT POPUP + SCRIPT FINAL (Version Debug améliorée) -->
-<style>
-  #mintPopup {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.65);
-    justify-content: center;
-    align-items: center;
-    font-family: 'Open Sans', sans-serif;
-  }
-  #mintPopup .popup-content {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
-  }
-  #mintPopup button {
-    margin-top: 20px;
-    padding: 12px 24px;
-    border: none;
-    background: #478ac9;
-    color: white;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-</style>
-
-<div id="mintPopup">
-  <div class="popup-content">
-    <h2>Mint your NFT</h2>
-    <p>Ce NFT est disponible pour <strong>0.1 STRK</strong>.</p>
-    <button id="mintNow">Mint maintenant</button>
-    <p id="mintStatus" style="margin-top:10px; font-size: 14px;"></p>
-  </div>
-</div>
-
 <script type="module">
   const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635";
   const STRK_ADDRESS = "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
@@ -207,6 +165,7 @@
         entrypoint: "ownerOf",
         calldata: ["0x1", "0x0"]
       });
+
       const owner = result.result[0].toLowerCase();
       console.log("👤 ownerOf(token 1) →", owner);
 
@@ -219,7 +178,7 @@
         if (popup) {
           popup.style.display = "flex";
         } else {
-          console.error("❌ L'élément #mintPopup est introuvable !");
+          console.error("❌ Le popup est absent !");
         }
       }
     } catch (err) {
@@ -228,7 +187,7 @@
       if (popup) {
         popup.style.display = "flex";
       } else {
-        console.error("❌ L'élément #mintPopup est introuvable dans le catch !");
+        console.error("❌ Popup introuvable dans le catch !");
       }
     }
 
@@ -236,42 +195,60 @@
     if (!mintBtn) {
       console.error("❌ Bouton #mintNow introuvable !");
       return;
-    } else {
-      console.log("✅ Bouton #mintNow trouvé, on attache le listener");
     }
 
     mintBtn.addEventListener("click", async () => {
       const status = document.getElementById("mintStatus");
       try {
         status.textContent = "⏳ Autorisation de 0.1 STRK...";
-        console.log("🟡 Appel approve()");
         await starknet.account.execute({
           contractAddress: STRK_ADDRESS,
           entrypoint: "approve",
           calldata: [CONTRACT_ADDRESS, PRICE_WEI]
         });
+
         status.textContent = "⏳ Mint en cours...";
-        console.log("🟡 Appel mint()");
         await starknet.account.execute({
           contractAddress: CONTRACT_ADDRESS,
           entrypoint: "mint",
           calldata: []
         });
-        status.textContent = "✅ NFT minté ! Rechargement imminent...";
-        console.log("✅ Mint réussi ! Reload dans 4s");
+
+        status.textContent = "✅ NFT minté ! Rafraîchissement...";
         setTimeout(() => location.reload(), 4000);
       } catch (e) {
         console.error("❌ Erreur lors du mint :", e);
-        status.textContent = "❌ Échec du mint. Vérifie ton wallet.";
+        status.textContent = "❌ Échec du mint.";
       }
     });
   }
 
+  function waitForPopupThenRun() {
+    const interval = 200;
+    let tries = 0;
+    const maxTries = 50;
+
+    const checkPopup = () => {
+      const popup = document.getElementById("mintPopup");
+      if (popup) {
+        console.log("✅ Popup détecté → lancement de runMintFlow()");
+        runMintFlow();
+      } else if (++tries < maxTries) {
+        setTimeout(checkPopup, interval);
+      } else {
+        console.error("❌ Échec : popup non trouvé après attente");
+      }
+    };
+
+    checkPopup();
+  }
+
   window.addEventListener("DOMContentLoaded", () => {
-    console.log("📄 DOM prêt → lancement de runMintFlow()");
-    runMintFlow();
+    console.log("📄 DOM prêt → attente du popup...");
+    waitForPopupThenRun();
   });
 </script>
+
 
 
 
