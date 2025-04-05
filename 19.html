@@ -123,7 +123,7 @@
 
 
 
-	 <!-- ✅ Popup Mint STRK -->
+	<!-- ✅ Popup Mint STRK -->
 <style>
   #mintPopup {
     display: none;
@@ -167,7 +167,7 @@
 
 <script type="module">
   const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635";
-  const STRK_ADDRESS = "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"; // STRK token
+  const STRK_ADDRESS = "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
   const PRICE_WEI = "100000000000000000"; // 0.1 STRK
 
   async function waitForStarknet(timeout = 10000) {
@@ -189,9 +189,11 @@
   }
 
   async function runMintFlow() {
+    console.log("🚀 Lancement du script...");
     const starknet = await waitForStarknet();
     await starknet.enable();
     const userAddress = starknet.selectedAddress.toLowerCase();
+    console.log("✅ Wallet connecté :", userAddress);
 
     try {
       const result = await starknet.account.callContract({
@@ -201,47 +203,50 @@
       });
 
       const owner = result.result[0].toLowerCase();
+      console.log("👤 Propriétaire du token 1 :", owner);
+
       if (owner === userAddress) {
+        console.log("✅ Accès autorisé");
         document.body.style.display = "block";
       } else {
+        console.log("🟥 Ce wallet ne possède pas le NFT");
         document.getElementById("mintPopup").style.display = "flex";
       }
-    } catch {
-      // Erreur = token probablement pas minté
+    } catch (e) {
+      console.log("🔍 Token 1 non minté, on affiche la popup.");
       document.getElementById("mintPopup").style.display = "flex";
     }
+
+    const mintBtn = document.getElementById("mintNow");
+    mintBtn.addEventListener("click", async () => {
+      const status = document.getElementById("mintStatus");
+      try {
+        status.textContent = "⏳ Autorisation de 0.1 STRK...";
+        await starknet.account.execute({
+          contractAddress: STRK_ADDRESS,
+          entrypoint: "approve",
+          calldata: [CONTRACT_ADDRESS, PRICE_WEI]
+        });
+
+        status.textContent = "⏳ Mint en cours...";
+        await starknet.account.execute({
+          contractAddress: CONTRACT_ADDRESS,
+          entrypoint: "mint",
+          calldata: []
+        });
+
+        status.textContent = "✅ NFT minté ! Rechargement...";
+        setTimeout(() => location.reload(), 4000);
+      } catch (e) {
+        console.error(e);
+        status.textContent = "❌ Erreur lors du mint.";
+      }
+    });
   }
 
-  async function doMint() {
-    const starknet = window.starknet;
-    const status = document.getElementById("mintStatus");
-
-    try {
-      status.textContent = "⏳ Autorisation de 0.1 STRK...";
-      await starknet.account.execute({
-        contractAddress: STRK_ADDRESS,
-        entrypoint: "approve",
-        calldata: [CONTRACT_ADDRESS, PRICE_WEI]
-      });
-
-      status.textContent = "⏳ Mint en cours...";
-      await starknet.account.execute({
-        contractAddress: CONTRACT_ADDRESS,
-        entrypoint: "mint",
-        calldata: []
-      });
-
-      status.textContent = "✅ NFT minté ! Rafraîchissement...";
-      setTimeout(() => location.reload(), 4000); // 💡 rafraîchit la page après 4 sec
-    } catch (e) {
-      console.error(e);
-      status.textContent = "❌ Échec du mint. Vérifie ton wallet.";
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", runMintFlow);
-  document.getElementById("mintNow").addEventListener("click", doMint);
+  window.addEventListener("DOMContentLoaded", runMintFlow);
 </script>
+
 
 
 
