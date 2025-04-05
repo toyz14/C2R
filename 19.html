@@ -124,7 +124,7 @@
 
 
 
-<!-- ✅ MINT POPUP + SCRIPT FINAL -->
+<!-- ✅ MINT POPUP + SCRIPT FINAL (Version Debug améliorée) -->
 <style>
   #mintPopup {
     display: none;
@@ -207,7 +207,6 @@
         entrypoint: "ownerOf",
         calldata: ["0x1", "0x0"]
       });
-
       const owner = result.result[0].toLowerCase();
       console.log("👤 ownerOf(token 1) →", owner);
 
@@ -216,11 +215,21 @@
         document.body.style.display = "block";
       } else {
         console.log("🟥 L'utilisateur ne possède pas le NFT → Affichage popup");
-        document.getElementById("mintPopup").style.display = "flex";
+        const popup = document.getElementById("mintPopup");
+        if (popup) {
+          popup.style.display = "flex";
+        } else {
+          console.error("❌ L'élément #mintPopup est introuvable !");
+        }
       }
     } catch (err) {
       console.warn("⚠️ ownerOf a échoué (peut-être pas minté encore)", err);
-      document.getElementById("mintPopup").style.display = "flex";
+      const popup = document.getElementById("mintPopup");
+      if (popup) {
+        popup.style.display = "flex";
+      } else {
+        console.error("❌ L'élément #mintPopup est introuvable dans le catch !");
+      }
     }
 
     const mintBtn = document.getElementById("mintNow");
@@ -236,25 +245,20 @@
       try {
         status.textContent = "⏳ Autorisation de 0.1 STRK...";
         console.log("🟡 Appel approve()");
-
         await starknet.account.execute({
           contractAddress: STRK_ADDRESS,
           entrypoint: "approve",
           calldata: [CONTRACT_ADDRESS, PRICE_WEI]
         });
-
         status.textContent = "⏳ Mint en cours...";
         console.log("🟡 Appel mint()");
-
         await starknet.account.execute({
           contractAddress: CONTRACT_ADDRESS,
           entrypoint: "mint",
           calldata: []
         });
-
-        status.textContent = "✅ NFT minté ! Rechargement...";
+        status.textContent = "✅ NFT minté ! Rechargement imminent...";
         console.log("✅ Mint réussi ! Reload dans 4s");
-
         setTimeout(() => location.reload(), 4000);
       } catch (e) {
         console.error("❌ Erreur lors du mint :", e);
@@ -264,10 +268,11 @@
   }
 
   window.addEventListener("DOMContentLoaded", () => {
-    console.log("📄 DOM prêt → lancement runMintFlow()");
+    console.log("📄 DOM prêt → lancement de runMintFlow()");
     runMintFlow();
   });
 </script>
+
 
 
 
