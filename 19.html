@@ -123,7 +123,39 @@
 
 
 
-<!-- 👇 COLLE CECI avant le script <script type="module"> -->
+<!-- ✅ Mint popup HTML + CSS + JS -->
+<style>
+  #mintPopup {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    justify-content: center;
+    align-items: center;
+    font-family: 'Open Sans', sans-serif;
+  }
+  #mintPopup .popup-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  }
+  #mintPopup button {
+    margin-top: 20px;
+    padding: 12px 24px;
+    border: none;
+    background: #478ac9;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+</style>
+
 <div id="mintPopup">
   <div class="popup-content">
     <h2>Mint your NFT</h2>
@@ -132,9 +164,6 @@
     <p id="mintStatus" style="margin-top:10px; font-size: 14px;"></p>
   </div>
 </div>
-
-
-	  
 
 <script type="module">
   const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635";
@@ -260,6 +289,7 @@
     waitForPopupThenRun();
   });
 </script>
+
 
 
 
