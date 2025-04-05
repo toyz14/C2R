@@ -123,7 +123,6 @@
 
 
 
-<!-- ✅ Mint popup HTML + CSS + JS -->
 <style>
   #mintPopup {
     display: none;
@@ -141,6 +140,7 @@
     padding: 30px;
     border-radius: 12px;
     max-width: 400px;
+    min-width: 200px;
     text-align: center;
     box-shadow: 0 0 20px rgba(0,0,0,0.2);
   }
@@ -168,7 +168,7 @@
 <script type="module">
   const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635";
   const STRK_ADDRESS = "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
-  const PRICE_WEI = "100000000000000000"; // 0.1 STRK
+  const PRICE_WEI = "100000000000000000";
 
   console.log("📦 Script chargé dans la page !");
 
@@ -215,18 +215,20 @@
         document.body.style.display = "block";
       } else {
         console.log("🟥 L'utilisateur ne possède pas le NFT → Affichage popup");
+        document.body.style.display = "block";
         const popup = document.getElementById("mintPopup");
         if (popup) {
-          popup.style.display = "flex";
+          popup.style.setProperty("display", "flex", "important");
         } else {
           console.error("❌ Le popup est absent !");
         }
       }
     } catch (err) {
       console.warn("⚠️ ownerOf a échoué (peut-être pas minté encore)", err);
+      document.body.style.display = "block";
       const popup = document.getElementById("mintPopup");
       if (popup) {
-        popup.style.display = "flex";
+        popup.style.setProperty("display", "flex", "important");
       } else {
         console.error("❌ Popup introuvable dans le catch !");
       }
@@ -289,6 +291,7 @@
     waitForPopupThenRun();
   });
 </script>
+
 
 
 
