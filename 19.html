@@ -6,10 +6,11 @@
 
 
 	<style>
-  body {
+  body:not(.show-content) {
     display: none;
   }
 </style>
+
 
 
 	  
@@ -212,10 +213,12 @@
 
       if (owner === userAddress) {
         console.log("🟢 L'utilisateur possède le NFT → Affichage contenu");
-        document.body.style.display = "block";
+      document.body.classList.add("show-content");
+
       } else {
         console.log("🟥 L'utilisateur ne possède pas le NFT → Affichage popup");
-        document.body.style.display = "block";
+document.body.classList.add("show-content");
+
         const popup = document.getElementById("mintPopup");
         if (popup) {
           popup.style.setProperty("display", "flex", "important");
@@ -225,7 +228,8 @@
       }
     } catch (err) {
       console.warn("⚠️ ownerOf a échoué (peut-être pas minté encore)", err);
-      document.body.style.display = "block";
+      document.body.classList.add("show-content");
+
       const popup = document.getElementById("mintPopup");
       if (popup) {
         popup.style.setProperty("display", "flex", "important");
