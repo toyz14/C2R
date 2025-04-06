@@ -126,66 +126,10 @@
 
 
 
-<style>
-  body:not(.show-content) {
-    display: none;
-  }
-
-  .blur-background *:not(#mintPopup):not(#mintPopup *) {
-    filter: blur(5px);
-    pointer-events: none;
-    user-select: none;
-  }
-
-  #mintPopup {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.65);
-    justify-content: center;
-    align-items: center;
-    font-family: 'Open Sans', sans-serif;
-  }
-
-  #mintPopup .popup-content {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    max-width: 400px;
-    min-width: 200px;
-    text-align: center;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-  }
-
-  #mintPopup button {
-    margin-top: 20px;
-    padding: 12px 24px;
-    border: none;
-    background: #478ac9;
-    color: white;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-</style>
-
-<div id="mintPopup">
-  <div class="popup-content">
-    <h2>Mint your NFT</h2>
-    <p>Ce NFT est disponible pour <strong>0.1 STRK</strong>.</p>
-    <button id="mintNow">Mint maintenant</button>
-    <p id="mintStatus" style="margin-top:10px; font-size: 14px;"></p>
-  </div>
-</div>
-
 <script type="module">
-  const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635"; // TON CONTRAT NFT
-  const STRK_ADDRESS = "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"; // CONTRAT STRK
-  const PRICE_WEI = "100000000000000000"; // 0.1 STRK en wei (18 décimales)
+  const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635";
+  const STRK_ADDRESS = "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
+  const PRICE = "0x16345785d8a0000"; // 0.1 STRK (1e17)
 
   console.log("📦 Script chargé dans la page !");
 
@@ -241,36 +185,35 @@
     }
 
     const mintBtn = document.getElementById("mintNow");
-if (!mintBtn) {
-  console.error("❌ Bouton #mintNow introuvable !");
-  return;
-}
+    if (!mintBtn) {
+      console.error("❌ Bouton #mintNow introuvable !");
+      return;
+    }
 
-mintBtn.addEventListener("click", async () => {
-  const status = document.getElementById("mintStatus");
-  try {
-    status.textContent = "⏳ Autorisation de 0.1 STRK...";
-    await starknet.account.execute({
-      contractAddress: STRK_ADDRESS,
-      entrypoint: "approve",
-      calldata: [CONTRACT_ADDRESS, PRICE_WEI]
+    mintBtn.addEventListener("click", async () => {
+      const status = document.getElementById("mintStatus");
+      try {
+        status.textContent = "⏳ Autorisation de 0.1 STRK...";
+        await starknet.account.execute({
+          contractAddress: STRK_ADDRESS,
+          entrypoint: "approve",
+          calldata: [CONTRACT_ADDRESS, PRICE]
+        });
+
+        status.textContent = "⏳ Mint en cours...";
+        await starknet.account.execute({
+          contractAddress: CONTRACT_ADDRESS,
+          entrypoint: "mint",
+          calldata: []
+        });
+
+        status.textContent = "✅ NFT minté ! Rafraîchissement...";
+        setTimeout(() => location.reload(), 4000);
+      } catch (e) {
+        console.error("❌ Erreur lors du mint :", e);
+        status.textContent = "❌ Échec du mint.";
+      }
     });
-
-    status.textContent = "⏳ Mint en cours...";
-    await starknet.account.execute({
-      contractAddress: CONTRACT_ADDRESS,  // Ton contrat NFT ici
-      entrypoint: "mint",
-      calldata: [] // ← Aucun paramètre attendu
-    });
-
-    status.textContent = "✅ NFT minté ! Rafraîchissement...";
-    setTimeout(() => location.reload(), 4000);
-  } catch (e) {
-    console.error("❌ Erreur lors du mint :", e);
-    status.textContent = "❌ Échec du mint.";
-  }
-});
-
   }
 
   function afficherPopup() {
@@ -286,7 +229,6 @@ mintBtn.addEventListener("click", async () => {
     const interval = 200;
     let tries = 0;
     const maxTries = 50;
-
     const checkPopup = () => {
       const popup = document.getElementById("mintPopup");
       if (popup) {
@@ -298,7 +240,6 @@ mintBtn.addEventListener("click", async () => {
         console.error("❌ Échec : popup non trouvé après attente");
       }
     };
-
     checkPopup();
   }
 
