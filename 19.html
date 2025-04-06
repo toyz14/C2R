@@ -126,7 +126,6 @@
 
 
 
-<!-- ✅ Masque la page tant que le NFT n’est pas possédé -->
 <style>
   body {
     display: none;
@@ -166,7 +165,6 @@
   }
 </style>
 
-<!-- ✅ Popup mint -->
 <div id="mintPopup">
   <div class="popup-content">
     <h2>Mint your NFT</h2>
@@ -176,11 +174,11 @@
   </div>
 </div>
 
-<!-- ✅ Script -->
 <script type="module">
   const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635";
   const STRK_ADDRESS = "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
   const PRICE_WEI = "100000000000000000";
+  const TOKEN_ID = ["0x1", "0x0"];
 
   console.log("📦 Script chargé dans la page !");
 
@@ -216,7 +214,7 @@
       const result = await starknet.account.callContract({
         contractAddress: CONTRACT_ADDRESS,
         entrypoint: "ownerOf",
-        calldata: ["0x1", "0x0"]
+        calldata: TOKEN_ID
       });
 
       const owner = result.result[0].toLowerCase();
@@ -227,13 +225,11 @@
         document.body.style.display = "block";
       } else {
         console.log("🟥 Utilisateur sans NFT → popup visible");
-        const popup = document.getElementById("mintPopup");
-        if (popup) popup.style.setProperty("display", "flex", "important");
+        document.getElementById("mintPopup").style.display = "flex";
       }
     } catch (err) {
       console.warn("⚠️ ownerOf a échoué (peut-être pas minté encore)", err);
-      const popup = document.getElementById("mintPopup");
-      if (popup) popup.style.setProperty("display", "flex", "important");
+      document.getElementById("mintPopup").style.display = "flex";
     }
 
     const mintBtn = document.getElementById("mintNow");
@@ -243,18 +239,22 @@
       const status = document.getElementById("mintStatus");
       try {
         status.textContent = "⏳ Autorisation de 0.1 STRK...";
-        await starknet.account.execute({
-          contractAddress: STRK_ADDRESS,
-          entrypoint: "approve",
-          calldata: [CONTRACT_ADDRESS, PRICE_WEI]
-        });
+        await starknet.account.execute([
+          {
+            contractAddress: STRK_ADDRESS,
+            entrypoint: "approve",
+            calldata: [CONTRACT_ADDRESS, PRICE_WEI]
+          }
+        ]);
 
         status.textContent = "⏳ Mint en cours...";
-        await starknet.account.execute({
-          contractAddress: CONTRACT_ADDRESS,
-          entrypoint: "mint",
-          calldata: []
-        });
+        await starknet.account.execute([
+          {
+            contractAddress: CONTRACT_ADDRESS,
+            entrypoint: "mint",
+            calldata: []
+          }
+        ]);
 
         status.textContent = "✅ NFT minté ! Rafraîchissement...";
         setTimeout(() => location.reload(), 4000);
@@ -265,29 +265,12 @@
     });
   }
 
-  function waitForPopupThenRun() {
-    const interval = 200;
-    let tries = 0;
-    const maxTries = 50;
-    const checkPopup = () => {
-      const popup = document.getElementById("mintPopup");
-      if (popup) {
-        console.log("✅ Popup détecté → lancement de runMintFlow()");
-        runMintFlow();
-      } else if (++tries < maxTries) {
-        setTimeout(checkPopup, interval);
-      } else {
-        console.error("❌ Popup non trouvé après attente");
-      }
-    };
-    checkPopup();
-  }
-
   window.addEventListener("DOMContentLoaded", () => {
-    console.log("📄 DOM prêt → attente du popup...");
-    waitForPopupThenRun();
+    console.log("📄 DOM prêt → lancement de runMintFlow()");
+    runMintFlow();
   });
 </script>
+
 
 
 
