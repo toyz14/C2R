@@ -160,17 +160,14 @@
     cursor: pointer;
   }
 
-  /* ✅ Applique le flou uniquement à l’arrière-plan */
-body.popup-blur .u-body,
-body.popup-blur header,
-body.popup-blur section,
-body.popup-blur footer {
-  filter: blur(8px) !important;
-  pointer-events: none;
-  user-select: none;
-}
-
+  /* ✅ VRAI flou sur tous les éléments sauf le popup */
+  body.popup-blur *:not(#mintPopup):not(#mintPopup *) {
+    filter: blur(8px) !important;
+    pointer-events: none;
+    user-select: none;
+  }
 </style>
+
 
 <div id="mintPopup">
   <div class="popup-content">
