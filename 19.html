@@ -161,14 +161,15 @@
   }
 
   /* ✅ Applique le flou uniquement à l’arrière-plan */
-  body.popup-blur .u-body > *:not(#mintPopup),
-  body.popup-blur > header,
-  body.popup-blur > section,
-  body.popup-blur > footer {
-    filter: blur(8px);
-    pointer-events: none;
-    user-select: none;
-  }
+body.popup-blur .u-body,
+body.popup-blur header,
+body.popup-blur section,
+body.popup-blur footer {
+  filter: blur(8px) !important;
+  pointer-events: none;
+  user-select: none;
+}
+
 </style>
 
 <div id="mintPopup">
