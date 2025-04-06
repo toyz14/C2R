@@ -185,7 +185,8 @@
 <script type="module">
   const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635";
   const STRK_ADDRESS = "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
-  const PRICE_WEI = "100000000000000000";
+  const PRICE_WEI_LOW = "100000000000000000"; // 0.1 STRK (low)
+  const PRICE_WEI_HIGH = "0"; // high = 0 pour 256 bits
 
   console.log("📦 Script chargé dans la page !");
 
@@ -253,7 +254,7 @@
         await starknet.account.execute({
           contractAddress: STRK_ADDRESS,
           entrypoint: "approve",
-          calldata: [CONTRACT_ADDRESS, PRICE_WEI]
+          calldata: [CONTRACT_ADDRESS, PRICE_WEI_LOW, PRICE_WEI_HIGH]
         });
 
         status.textContent = "⏳ Mint en cours...";
@@ -306,6 +307,7 @@
     waitForPopupThenRun();
   });
 </script>
+
 
 
 
