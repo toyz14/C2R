@@ -126,7 +126,6 @@
 
 
 
-<!-- ✅ Masque la page tant que le NFT n’est pas possédé -->
 <style>
   body {
     display: none;
@@ -166,7 +165,6 @@
   }
 </style>
 
-<!-- ✅ Popup mint -->
 <div id="mintPopup">
   <div class="popup-content">
     <h2>Mint your NFT</h2>
@@ -176,7 +174,6 @@
   </div>
 </div>
 
-<!-- ✅ Script -->
 <script type="module">
   const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635";
   const STRK_ADDRESS = "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
@@ -243,18 +240,22 @@
       const status = document.getElementById("mintStatus");
       try {
         status.textContent = "⏳ Autorisation de 0.1 STRK...";
-        await starknet.account.execute({
-          contractAddress: STRK_ADDRESS,
-          entrypoint: "approve",
-          calldata: [CONTRACT_ADDRESS, PRICE_WEI]
-        });
+        await starknet.account.execute([
+          {
+            contractAddress: STRK_ADDRESS,
+            entrypoint: "approve",
+            calldata: [CONTRACT_ADDRESS, PRICE_WEI]
+          }
+        ]);
 
         status.textContent = "⏳ Mint en cours...";
-        await starknet.account.execute({
-          contractAddress: CONTRACT_ADDRESS,
-          entrypoint: "mint",
-          calldata: []
-        });
+        await starknet.account.execute([
+          {
+            contractAddress: CONTRACT_ADDRESS,
+            entrypoint: "mint",
+            calldata: []
+          }
+        ]);
 
         status.textContent = "✅ NFT minté ! Rafraîchissement...";
         setTimeout(() => location.reload(), 4000);
@@ -288,6 +289,7 @@
     waitForPopupThenRun();
   });
 </script>
+
 
 
 
