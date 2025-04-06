@@ -126,7 +126,12 @@
 
 
 
+<!-- ✅ Masque la page tant que le NFT n’est pas possédé -->
 <style>
+  body {
+    display: none;
+  }
+
   #mintPopup {
     display: none;
     position: fixed;
@@ -159,16 +164,9 @@
     border-radius: 8px;
     cursor: pointer;
   }
-
-  /* ✅ VRAI flou sur tous les éléments sauf le popup */
-  body.popup-blur *:not(#mintPopup):not(#mintPopup *) {
-    filter: blur(8px) !important;
-    pointer-events: none;
-    user-select: none;
-  }
 </style>
 
-
+<!-- ✅ Popup mint -->
 <div id="mintPopup">
   <div class="popup-content">
     <h2>Mint your NFT</h2>
@@ -178,6 +176,7 @@
   </div>
 </div>
 
+<!-- ✅ Script -->
 <script type="module">
   const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635";
   const STRK_ADDRESS = "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
@@ -224,32 +223,21 @@
       console.log("👤 ownerOf(token 1) →", owner);
 
       if (owner === userAddress) {
-        console.log("🟢 L'utilisateur possède le NFT → Affichage contenu");
+        console.log("🟢 L'utilisateur possède le NFT → Affichage page");
         document.body.style.display = "block";
       } else {
-        console.log("🟥 L'utilisateur ne possède pas le NFT → Affichage popup + flou");
-        document.body.style.display = "block";
-        document.body.classList.add("popup-blur");
+        console.log("🟥 Utilisateur sans NFT → popup visible");
         const popup = document.getElementById("mintPopup");
-        if (popup) {
-          popup.style.setProperty("display", "flex", "important");
-        }
+        if (popup) popup.style.setProperty("display", "flex", "important");
       }
     } catch (err) {
       console.warn("⚠️ ownerOf a échoué (peut-être pas minté encore)", err);
-      document.body.style.display = "block";
-      document.body.classList.add("popup-blur");
       const popup = document.getElementById("mintPopup");
-      if (popup) {
-        popup.style.setProperty("display", "flex", "important");
-      }
+      if (popup) popup.style.setProperty("display", "flex", "important");
     }
 
     const mintBtn = document.getElementById("mintNow");
-    if (!mintBtn) {
-      console.error("❌ Bouton #mintNow introuvable !");
-      return;
-    }
+    if (!mintBtn) return;
 
     mintBtn.addEventListener("click", async () => {
       const status = document.getElementById("mintStatus");
@@ -269,7 +257,6 @@
         });
 
         status.textContent = "✅ NFT minté ! Rafraîchissement...";
-        document.body.classList.remove("popup-blur");
         setTimeout(() => location.reload(), 4000);
       } catch (e) {
         console.error("❌ Erreur lors du mint :", e);
@@ -282,7 +269,6 @@
     const interval = 200;
     let tries = 0;
     const maxTries = 50;
-
     const checkPopup = () => {
       const popup = document.getElementById("mintPopup");
       if (popup) {
@@ -291,10 +277,9 @@
       } else if (++tries < maxTries) {
         setTimeout(checkPopup, interval);
       } else {
-        console.error("❌ Échec : popup non trouvé après attente");
+        console.error("❌ Popup non trouvé après attente");
       }
     };
-
     checkPopup();
   }
 
@@ -303,6 +288,7 @@
     waitForPopupThenRun();
   });
 </script>
+
 
 
 
