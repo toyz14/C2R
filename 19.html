@@ -241,35 +241,36 @@
     }
 
     const mintBtn = document.getElementById("mintNow");
-    if (!mintBtn) {
-      console.error("❌ Bouton #mintNow introuvable !");
-      return;
-    }
+if (!mintBtn) {
+  console.error("❌ Bouton #mintNow introuvable !");
+  return;
+}
 
-    mintBtn.addEventListener("click", async () => {
-      const status = document.getElementById("mintStatus");
-      try {
-        status.textContent = "⏳ Autorisation de 0.1 STRK...";
-        await starknet.account.execute({
-          contractAddress: STRK_ADDRESS,
-          entrypoint: "approve",
-          calldata: [CONTRACT_ADDRESS, PRICE_WEI]
-        });
-
-        status.textContent = "⏳ Mint en cours...";
-        await starknet.account.execute({
-          contractAddress: CONTRACT_ADDRESS,
-          entrypoint: "mint",
-          calldata: [] // NE PAS METTRE userAddress ICI
-        });
-
-        status.textContent = "✅ NFT minté ! Rafraîchissement...";
-        setTimeout(() => location.reload(), 4000);
-      } catch (e) {
-        console.error("❌ Erreur lors du mint :", e);
-        status.textContent = "❌ Échec du mint.";
-      }
+mintBtn.addEventListener("click", async () => {
+  const status = document.getElementById("mintStatus");
+  try {
+    status.textContent = "⏳ Autorisation de 0.1 STRK...";
+    await starknet.account.execute({
+      contractAddress: STRK_ADDRESS,
+      entrypoint: "approve",
+      calldata: [CONTRACT_ADDRESS, PRICE_WEI]
     });
+
+    status.textContent = "⏳ Mint en cours...";
+    await starknet.account.execute({
+      contractAddress: CONTRACT_ADDRESS,  // Ton contrat NFT ici
+      entrypoint: "mint",
+      calldata: [] // ← Aucun paramètre attendu
+    });
+
+    status.textContent = "✅ NFT minté ! Rafraîchissement...";
+    setTimeout(() => location.reload(), 4000);
+  } catch (e) {
+    console.error("❌ Erreur lors du mint :", e);
+    status.textContent = "❌ Échec du mint.";
+  }
+});
+
   }
 
   function afficherPopup() {
