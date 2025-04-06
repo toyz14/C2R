@@ -127,6 +127,10 @@
 
 
 <style>
+  body:not(.show-content) {
+    display: none;
+  }
+
   .blur-background *:not(#mintPopup):not(#mintPopup *) {
     filter: blur(5px);
     pointer-events: none;
@@ -179,9 +183,9 @@
 </div>
 
 <script type="module">
-  const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635";
-  const STRK_ADDRESS = "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
-  const PRICE_WEI = "100000000000000000"; // 0.1 STRK
+  const CONTRACT_ADDRESS = "0x09d09963abd961382d7728b111f6c0c11bae38c82f723a502047d10c4db5635"; // TON CONTRAT NFT
+  const STRK_ADDRESS = "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"; // CONTRAT STRK
+  const PRICE_WEI = "100000000000000000"; // 0.1 STRK en wei (18 décimales)
 
   console.log("📦 Script chargé dans la page !");
 
@@ -246,18 +250,18 @@
       const status = document.getElementById("mintStatus");
       try {
         status.textContent = "⏳ Autorisation de 0.1 STRK...";
-        await starknet.account.execute([{
+        await starknet.account.execute({
           contractAddress: STRK_ADDRESS,
           entrypoint: "approve",
           calldata: [CONTRACT_ADDRESS, PRICE_WEI]
-        }]);
+        });
 
         status.textContent = "⏳ Mint en cours...";
-        await starknet.account.execute([{
+        await starknet.account.execute({
           contractAddress: CONTRACT_ADDRESS,
           entrypoint: "mint",
-          calldata: []
-        }]);
+          calldata: [] // NE PAS METTRE userAddress ICI
+        });
 
         status.textContent = "✅ NFT minté ! Rafraîchissement...";
         setTimeout(() => location.reload(), 4000);
@@ -302,6 +306,7 @@
     waitForPopupThenRun();
   });
 </script>
+
 
 
 
